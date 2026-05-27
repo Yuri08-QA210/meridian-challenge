@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERIDIAN - Lattice KEM Research</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #08080e;
+            color: #d0d0d0;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #1a1a2a;
+            padding-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: #ff6644;
+            text-shadow: 0 0 20px rgba(255,102,68,0.3);
+            letter-spacing: 10px;
+        }
+        .header .subtitle {
+            color: #555;
+            margin-top: 10px;
+            font-size: 0.85em;
+            letter-spacing: 2px;
+        }
+        .section {
+            background: #0e0e16;
+            border: 1px solid #1a1a28;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #ff4422;
+            margin-bottom: 16px;
+            font-size: 1.1em;
+            letter-spacing: 3px;
+        }
+        .section p, .section li {
+            color: #999;
+            line-height: 1.8;
+            font-size: 0.85em;
+        }
+        .section code {
+            background: #161620;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #ff8866;
+            font-size: 0.9em;
+        }
+        .endpoint {
+            background: #0a0a12;
+            border: 1px solid #161622;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .endpoint .method {
+            display: inline-block;
+            background: #ff6644;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.75em;
+            margin-right: 8px;
+        }
+        .endpoint .method.get { background: #44aaff; }
+        .endpoint .method.post { background: #ff6644; }
+        .endpoint .path {
+            color: #fff;
+            font-size: 0.85em;
+        }
+        .endpoint .desc {
+            color: #777;
+            font-size: 0.8em;
+            margin-top: 8px;
+        }
+        .params {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+        .params li {
+            color: #888;
+            font-size: 0.8em;
+        }
+        .params code {
+            color: #ffaa44;
+        }
+        .console {
+            background: #040408;
+            border: 1px solid #1a1a28;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            font-size: 0.78em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .console .prompt { color: #ff6644; }
+        .console .output { color: #666; }
+        .warning {
+            border-color: #ff2200;
+            background: #120808;
+        }
+        .warning h2 { color: #ff2200; }
+        .param-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 4px 16px;
+            margin-top: 10px;
+        }
+        .param-grid .label { color: #ff6644; font-size: 0.8em; }
+        .param-grid .value { color: #888; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MERIDIAN</h1>
+            <div class="subtitle">Post-Quantum Key Encapsulation Research Platform</div>
+        </div>
+
+        <div class="section">
+            <h2>SCHEME PARAMETERS</h2>
+            <div class="param-grid">
+                <span class="label">Dimension (n)</span>
+                <span class="value">40</span>
+                <span class="label">Modulus (q)</span>
+                <span class="value">12289 (prime)</span>
+                <span class="label">Error bound</span>
+                <span class="value">{-1, 0, 1}</span>
+                <span class="label">Secret type</span>
+                <span class="value">Binary vector, Hamming weight = 20</span>
+                <span class="label">Public key</span>
+                <span class="value">(A, b) where b = A*s + e mod q</span>
+            </div>
+            <p style="margin-top: 16px;">
+                The Key Encapsulation Mechanism (KEM) allows secure message transmission.
+                A message bit m is encapsulated as ciphertext (u, v) where:
+                u = A^T * r + e1 mod q, v = b^T * r + e2 + m * floor(q/2) mod q.
+                Decapsulation recovers m from (u, v) using the private key s.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>API ENDPOINTS</h2>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/info</span>
+                <div class="desc">Challenge parameters and configuration</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/public_key</span>
+                <div class="desc">The public key (A, b) for encapsulation</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/flag</span>
+                <div class="desc">The encapsulated flag ciphertexts (array of {u, v} pairs)</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/api/decapsulate</span>
+                <div class="desc">Submit a ciphertext for decapsulation</div>
+                <ul class="params">
+                    <li>Body: <code>{"u": [int*40], "v": int}</code></li>
+                    <li>Returns: <code>{"bit": 0|1, "processing_time_us": float, "queries_remaining": int}</code></li>
+                    <li>Use <code>X-Session-ID</code> header for session tracking</li>
+                </ul>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/api/session</span>
+                <div class="desc">Create a new session with fresh query counter</div>
+            </div>
+        </div>
+
+        <div class="section warning">
+            <h2>SERVICE NOTICE</h2>
+            <p>This service implements a custom KEM for research purposes. Each session is limited to 10,000 decapsulation queries. The server reports its internal processing time for performance monitoring.</p>
+        </div>
+
+        <div class="section">
+            <h2>SAMPLE INTERACTION</h2>
+            <div class="console">
+                <div><span class="prompt">$</span> curl /api/info</div>
+                <div class="output">{"challenge": "MERIDIAN", "parameters": {"n": 40, "q": 12289, ...}}</div>
+                <br>
+                <div><span class="prompt">$</span> curl /api/public_key</div>
+                <div class="output">{"A": [[...], ...], "b": [...], "n": 40, "q": 12289}</div>
+                <br>
+                <div><span class="prompt">$</span> curl -X POST /api/decapsulate -H "Content-Type: application/json" \</div>
+                <div>&nbsp;&nbsp;-d '{"u": [0,0,...,1000,...,0], "v": 5000}'</div>
+                <div class="output">{"bit": 1, "processing_time_us": 42.17, "queries_remaining": 9999}</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
